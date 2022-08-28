@@ -1,4 +1,5 @@
 //@LionoMaker
+
 /*
 Hardware connection
 ESP32:          SD_CARD Module:
@@ -11,6 +12,7 @@ CS/SS-----------------------D5
 */
 
 #include <Arduino.h>
+
 // Libraries for SD card
 #include "FS.h"
 #include "SD.h"
@@ -24,8 +26,8 @@ CS/SS-----------------------D5
 
 
 // Replace with your network credentials
-const char* ssid     = "EiG";
-const char* password = "12344321";
+const char* ssid     = "Galaxy A12B70B";
+const char* password = "ohtn2126";
 // ifstream fileName;
 // // fileName.eof();
 
@@ -33,10 +35,11 @@ const char* password = "12344321";
 unsigned long lastTime = 0;
 unsigned long timerDelay = 1000;
 
-const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = 18000;
+const char* ntpServer = "pool.ntp.org"; //worldwilde extention
+const long  gmtOffset_sec = 18000;      
 const int   daylightOffset_sec = 0;
-char timeStringBuff[50]; //50 chars should be enough
+//char timeStringBuff[50]; //50 chars should be enough
+char Buffer[50];
 int i=0; //sr no.
 int yr,mon,dy,hr,sc,mn;
 
@@ -76,33 +79,9 @@ void printLocalTime()
    hr=timeinfo.tm_hour;
    mn=timeinfo.tm_min;
    sc=timeinfo.tm_sec;
-   Strng=String(yr)+ "" +String(mon)+ "" +String(dy)+ "  " +String(hr)+ ":" +String(mn)+ ":" +String(sc)+"\r\n";
-}
-
-// void HelloDate_Time(){
-//   //delay(1000);
-//   printLocalTime(); //call and print local date and time
-// }
-
-//Serial no.
-void Srno(){
-// for(int i=1;true;i++)
-// {
-//   delay(1000);
-//   Serial.println(i);
-//     //i++;
-// }
-// while (true)
-// {
-//   i++;
-//   delay(1000);
-//   Serial.println(i);
-// }
-
-  i++;
-  //delay(1000);
-  Serial.println(i);
-
+   sprintf(Buffer, "%02u %04u%02u%02u %02u:%02u:%02u\n",i++ , yr, mon, dy, hr, mn, sc);
+   Serial.print(Buffer);
+   //Strng=String(yr)+ "" +String(mon)+ "" +String(dy)+ "  " +String(hr)+ ":" +String(mn)+ ":" +String(sc)+"\r\n";
 }
 
 // Initialize WiFi
@@ -138,6 +117,7 @@ void initSDCard(){
     Serial.println("SDHC");
   } else {
     Serial.println("UNKNOWN");
+
   }
   uint64_t cardSize = SD.cardSize() / (1024 * 1024);
   Serial.printf("SD Card Size: %lluMB\n", cardSize);
@@ -208,35 +188,31 @@ void setup() {
   WiFi.mode(WIFI_OFF);
   
   // Create a file on the SD card and write the data labels
-  File file = SD.open("/let.txt");
+  File file = SD.open("/done.txt");
   if(!file) {
     Serial.println("File doesn't exist");
     Serial.println("Creating file...");
-    writeFile(SD, "/let.txt", "Sr, Unix Time, YYYYMMDD HH:MM:SS\r\n");
+    writeFile(SD, "/done.txt", "Sr YYYYMMDD HH:MM:SS epochTime\r\n");
   }
   else {
     Serial.println("File already exists");  
   }
   file.close();
 }
-
 void loop() {
-//setTime(2022,8,24,5,28,50,1);
 
   if ((millis() - lastTime) > timerDelay) {
   //   //Get epoch time
     epochTime = getTime();
-    //HelloDate_Time();
     printLocalTime();
-    Srno();
 
     //Concatenate all info separated by commas
-    dataMessage = String(i)+ "," +String(epochTime)+ "," +String(Strng)+"\r\n";
+    dataMessage = String(Buffer)+ "," +String(epochTime)+"\r\n";
     Serial.print("Saving data: ");
     Serial.println(dataMessage);
 
     //Append the data to file
-    appendFile(SD, "/let.txt", dataMessage.c_str());
+    appendFile(SD, "/done.txt", dataMessage.c_str());
 
     lastTime = millis();
   }
