@@ -1,5 +1,16 @@
-#include <Arduino.h>
+//LionoMaker
+/*
+Hardware connection
+ESP32:          SD_CARD Module:
+MOSI------------------------D23
+MISO------------------------D19
+SCK-------------------------D18
+GND-------------------------GND
+VCC-------------------------VCC
+CS/SS-----------------------D5
+*/
 
+#include <Arduino.h>
 // Libraries for SD card
 #include "FS.h"
 #include "SD.h"
